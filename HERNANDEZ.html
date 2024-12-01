@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: url('UEAST.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            width: 400px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .university-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .university-logos img {
+            margin: -80px;
+            height: 350px;
+            width: auto;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 90%;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button.logout {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 90%;
+            margin-bottom: 10px;
+        }
+
+        button.logout:hover {
+            background-color: #a71d2a;
+        }
+
+        #login-error {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        #submitted-strings-container {
+            margin-top: 5px;
+            margin-bottom: 5px;
+            max-height: 180px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            text-align: left;
+        }
+
+        .submitted-string {
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 5px 12px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Form -->
+    <div class="login-container" id="login-container">
+        <div class="university-logos">
+            <img src="logo.png" alt="University Logo">
+        </div>
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button onclick="login()">Login</button>
+        <p id="login-error" style="display:none;">Invalid credentials. Please try again.</p>
+    </div>
+
+    <!-- Input String Form -->
+    <div class="login-container" id="input-container" style="display:none;">
+        <div class="university-logos">
+            <img src="logo.png" alt="University Logo">
+        </div>
+        <h2>Input String</h2>
+        <input type="text" id="user-input" placeholder="Enter a string">
+        <button id="submit-btn">Submit</button>
+
+        <!-- Submitted Strings Container -->
+        <div id="submitted-strings-container"></div>
+
+        <button class="logout" onclick="logout()">Logout</button>
+    </div>
+
+    <script>
+        const validUsername = "username";
+        const validPassword = "password";
+
+        function login() {
+            const username = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value.trim();
+            if (username === validUsername && password === validPassword) {
+                localStorage.setItem("loggedIn", "true");
+                toggleView();
+                displaySubmittedStrings();
+                clearLoginError();
+                clearInputFields();
+                alert("Login successful!");
+            } else {
+                document.getElementById("login-error").style.display = "block";
+            }
+        }
+
+        function toggleView() {
+            document.getElementById("login-container").style.display = "none";
+            document.getElementById("input-container").style.display = "block";
+        }
+
+        function clearLoginError() {
+            document.getElementById("login-error").style.display = "none";
+        }
+
+        function clearInputFields() {
+            document.getElementById("username").value = "";
+            document.getElementById("password").value = "";
+        }
+
+        function submitString() {
+            console.log("Submit button clicked");
+            const userInputElement = document.getElementById("user-input");
+            if (!userInputElement) {
+                alert("Input field is missing!");
+                return;
+            }
+            const userInput = userInputElement.value.trim();
+            if (userInput) {
+                let stringsArray = JSON.parse(localStorage.getItem("strings")) || [];
+                stringsArray.push(userInput);
+                localStorage.setItem("strings", JSON.stringify(stringsArray));
+                displaySubmittedStrings();
+                userInputElement.value = "";
+            } else {
+                alert("Please enter a valid string.");
+            }
+        }
+
+        function displaySubmittedStrings() {
+            const submittedStringsContainer = document.getElementById("submitted-strings-container");
+            submittedStringsContainer.innerHTML = "";
+            const stringsArray = JSON.parse(localStorage.getItem("strings")) || [];
+            stringsArray.forEach((str) => {
+                const stringDiv = document.createElement("div");
+                stringDiv.className = "submitted-string";
+                stringDiv.innerText = str;
+                submittedStringsContainer.appendChild(stringDiv);
+            });
+        }
+
+        function logout() {
+            localStorage.removeItem("loggedIn");
+            document.getElementById("login-container").style.display = "block";
+            document.getElementById("input-container").style.display = "none";
+            clearInputFields();
+            alert('You have logged out successfully.');
+        }
+
+        window.onload = function() {
+            if (localStorage.getItem("loggedIn") === "true") {
+                toggleView();
+                displaySubmittedStrings();
+            }
+        };
+
+        window.addEventListener("storage", (event) => {
+            if (event.key === "strings") {
+                displaySubmittedStrings();
+            }
+        });
+
+        document.getElementById("submit-btn").addEventListener("click", submitString);
+    </script>
+</body>
+</html>
